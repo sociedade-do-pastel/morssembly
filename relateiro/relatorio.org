@@ -1,0 +1,115 @@
+#+BIND: org-export-publishing-directory "output"
+#+OPTIONS: toc:nil
+#+TITLE: Interpretador de código morse para microcontroladores da família 8051
+#+AUTHOR: Guilherme Ormond Sampaio & Leon Ferreira Bellini
+
+* Introdução
+  Projetado como codificação para o envio de mensagens por pulso a grandes 
+distâncias, o Código Morse mostrou-se de extrema importância exatamente por essa
+codificação, permitindo-o ser além de universal, é facilmente compreendido e 
+dispositivos para envio e interpretação de seus caracteres são facilmente 
+produzidos. 
+
+#+CAPTION: Lista de caracteres do Código Morse (SNODGRASS & CAMP)
+#+NAME: fig:MORSE
+[[./img/codigo_morsa.png]]
+* Objetivos
+  O objetivo geral do projeto é desenvolver um interpretador de código morse, ou
+seja, um "conversor" de morse para caracteres do alfabeto latino. O projeto será 
+exclusivo para microcontroladores da família 8051 e, por ter sua programação feita 
+totalmente em /assembly/ para tal família, a portabilidade do mesmo é mínima.
+
+Todas as simulações serão realizadas na IDE /edSim/, é recomendada a frequência
+de atualização de 10KHz por motivos os quais serão detalhados.
+
+** O interpretador 
+   Em primeira instância, o código para a distinção entre pontos e traços, os 
+quais são as principais características da codificação do sistema será baseado
+no quanto de tempo o usuário pressionou o botão ligado ao pino *P3.2* 
+no teclado do simulador. O tempo em questão é de 16 milissegundos, tal métrica 
+fora obtida do tempo padrão para ativar-se um botão em um jogo que trabalhe com 
+60 /frames/ por segundo. Por se tratar de uma simulação, o tempo calculado para uma
+situação real apenas serve como uma forma de determinar o padrão, este sendo
+mais funcional quando o simulador está configurado para atualizar em 10MHz.
+ O usuário *deve* apertar um outro botão para que o 
+programa entenda que seu caractere já foi digitado, permitindo o microcontrolador 
+a interpretar a sequência recebida.
+
+#+CAPTION: Parte pronta do código a qual  determina se há uma linha ou clique
+#+NAME: fig:codigo_bot
+#+BEGIN_SRC asm
+  org 30h
+  CONTINHAS:
+	  ;; gravar o tempo que ficou apertado
+	  CLR C
+	  CLR OV	
+	  MOV A, TL0
+	  SUBB A, R3 ;; inutil talvez?
+	  ;; A - R3 ainda produziria carry
+	  MOV A, TH0
+	  SUBB A, R2 ;; se setar ACC, é menor?
+	  JC MENOR
+	  CLR P1.0 ;; teste aqui é uma linha
+  VOLTA:	
+	  NOP
+	  LJMP FINAL
+
+  org 65h
+  MENOR:
+	  CLR p1.1 ;; aqui um clique
+	  LJMP VOLTA
+	
+  org 50h
+  TEMP: 
+	  CPL TR0
+	  RET
+
+  org 80h
+  MAIN_LOOP:
+	  MOV TMOD, #00001001h 
+	  ;; interesse está no tempo apertado
+	  MOV TH0, #0
+	  MOV TL0, #0
+	  ;; 16MS é 3e80 (16bits) 
+	  MOV R2, #0X3E 
+	  MOV R3, #0X80
+	  SETB EA
+	  SETB IT0
+  CONTROLE:
+	  JB BOTAO, $
+	  LCALL TEMP
+	  JNB BOTAO, $
+	  LCALL TEMP
+	  LJMP CONTINHAS 
+  FINAL:
+	  LCALL ZERAR
+	  SJMP CONTROLE
+
+#+END_SRC
+
+No momento questões de otimização de ROM tomada e ciclos de processamento
+estão em segundo plano.
+
+** O "banco de dados"
+   Todos os caracteres podem ser dispostos num grafo do tipo árvore. Dependendo 
+da "pontuação" de cada caractere digitado, o ponteiro DPTR pode ser movimentado 
+de acordo por entre os endereços onde os códigos dos carácteres podem ser encontrados
+na memória. Estes códigos de início representarão letras e números compatíveis com 
+o /display/ LCD /Hitachi/ 44780.
+
+#+CAPTION: Árvore de caracteres do código morse
+#+NAME: fig:MORSE_TREE
+[[./img/arvre.jpg]]
+
+** O /output/
+   Como dito anteriormente, inicialmente os carácteres serão dispostos no 
+/display/ 44780, o qual possuí módulo na IDE /edsim/, quaisquer carácteres inválidos
+serão substituídos por um /kana/ (caractere da família de ideogramas japoneses) 
+o qual ainda será definido.
+ Se o mesmo /display/ provar-se
+muito trabalhoso de se compreender, a transmissão via serial é uma alternativa, 
+uma vez que o tempo para entrega do projeto é curta.
+
+#+CAPTION: Módulo do edsim para LCD
+#+NAME: fig:LCD
+[[./img/lcd.png]]
