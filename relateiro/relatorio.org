@@ -6,9 +6,8 @@
 * Introdução
   Projetado como codificação para o envio de mensagens por pulso a grandes 
 distâncias, o Código Morse mostrou-se de extrema importância exatamente por essa
-codificação, permitindo-o ser além de universal, é facilmente compreendido e 
-dispositivos para envio e interpretação de seus caracteres são facilmente 
-produzidos. 
+codificação, permitindo-o ser além de universal, facilmente compreendido. Dispositivos 
+para envio e interpretação de seus caracteres são facilmente produzidos. 
 
 #+CAPTION: Lista de caracteres do Código Morse (SNODGRASS & CAMP)
 #+NAME: fig:MORSE
@@ -99,13 +98,16 @@ o /display/ LCD /Hitachi/ 44780.
 
 #+CAPTION: Árvore de caracteres do código morse
 #+NAME: fig:MORSE_TREE
-[[./img/arvre.jpg]]
+[[./img/arvre.png]]
+
+   Os números grafados em vermelho representam a posição que ocuparão na memória, partindo 
+da posição 40 e seguinto até a posição 102. Caso seja necessária alguma alteração em 
+suas posições, basta alterar o endereço inicial pelo comando /org/.
 
 ** O /output/
    Como dito anteriormente, inicialmente os carácteres serão dispostos no 
 /display/ 44780, o qual possuí módulo na IDE /edsim/, quaisquer carácteres inválidos
-serão substituídos por um /kana/ (caractere da família de ideogramas japoneses) 
-o qual ainda será definido.
+serão substituídos por um /blankspace/ (ausência de caracter).
  Se o mesmo /display/ provar-se
 muito trabalhoso de se compreender, a transmissão via serial é uma alternativa, 
 uma vez que o tempo para entrega do projeto é curta.
@@ -113,3 +115,73 @@ uma vez que o tempo para entrega do projeto é curta.
 #+CAPTION: Módulo do edsim para LCD
 #+NAME: fig:LCD
 [[./img/lcd.png]]
+
+#+CAPTION: Tabela de posições, caracteres e representação dos caracteres no LCD.
+| memória | letra | conteúdo (hex) |
+|---------+-------+----------------|
+|      40 | E     |             45 |
+|      41 | I     |             49 |
+|      42 | S     |             53 |
+|      43 | H     |             48 |
+|      44 | 5     |             35 |
+|      45 | 4     |             34 |
+|      46 | V     |             56 |
+|      47 |       |             20 |
+|      48 | 3     |             33 |
+|      49 | U     |             55 |
+|      50 | F     |             46 |
+|      51 |       |             20 |
+|      52 |       |             20 |
+|      53 |       |             20 |
+|      54 |       |             20 |
+|      55 | 2     |             32 |
+|      56 | A     |             41 |
+|      57 | R     |             52 |
+|      58 | L     |             4C |
+|      59 |       |             20 |
+|      60 |       |             20 |
+|      61 |       |             20 |
+|      62 | +     |             2B |
+|      63 |       |             20 |
+|      64 | W     |             57 |
+|      65 | P     |             50 |
+|      66 |       |             20 |
+|      67 |       |             20 |
+|      68 | J     |             4A |
+|      69 |       |             20 |
+|      70 | 1     |             31 |
+|      71 | START |             20 |
+|      72 | 0     |             30 |
+|      73 | 9     |             39 |
+|      74 |       |             20 |
+|      75 |       |             20 |
+
+| memória | letra | conteúdo (hex) |
+|---------+-------+----------------|
+|      76 | 8     |             38 |
+|      77 |       |             20 |
+|      78 | O     |             4F |
+|      79 |       |             20 |
+|      80 |       |             20 |
+|      81 | Q     |             51 |
+|      82 |       |             20 |
+|      83 | 7     |             37 |
+|      84 | Z     |             5A |
+|      85 | G     |             47 |
+|      86 | M     |             4D |
+|      87 |       |             20 |
+|      88 |       |             20 |
+|      89 | Y     |             59 |
+|      90 |       |             20 |
+|      91 |       |             BC |
+|      92 | C     |             43 |
+|      93 | K     |             4B |
+|      94 |       |             20 |
+|      95 | /     |             2F |
+|      96 | X     |             58 |
+|      97 | =     |             3D |
+|      98 | 6     |             36 |
+|      99 | B     |             42 |
+|     100 | D     |             44 |
+|     101 | N     |             4E |
+|     102 | T     |             54 |
