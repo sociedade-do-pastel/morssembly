@@ -183,6 +183,10 @@ PEGAR_ENDR:
 	MOV DPTR,#TABELA
 	MOVC A,@A+DPTR
 	MOV REGLCD,A
+RESET_ENDR:
+	MOV R4, #1
+	MOV R0, #32
+	MOV ENDR, #31
 	RET
 TABELA:
 	DB 45h, 49h, 53h, 48h, 35h, 34h, 56h, 20h, 33h, 55h, 46h, 20h, 20h, 20h, 20h, 32h, 41h, 52h, 4Ch, 20h, 20h, 20h, 2Bh, 20h, 57h, 50h, 20h, 20h, 4Ah, 20h, 31h, 20h, 30h, 39h, 20h, 20h, 38h, 20h, 4Fh, 20h, 20h, 51h, 20h, 37h, 5Ah, 47h, 4Dh, 20h, 20h, 59h, 20h, BCh, 43h, 4Bh, 20h, 2Fh, 58h, 3Dh, 36h, 42h, 44h, 4Eh, 54h
