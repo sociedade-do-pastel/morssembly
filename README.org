@@ -4,13 +4,13 @@ Aqui implementaremos um interpretador/ /parser/ de código morse num
 microcontrolador da família 8051 como projeto de semestre para arquitetura
 de computadores
 
-** Cousas a fazer [50%]
+** Cousas a fazer [100%]
    - [X] Determinar algoritmo de /parsing/
      - Contagem de tempo para determinar se foi ponto ou linha (feito)
      - +Necessidade de loop com contador ou apenas GATE+
      - +Necessário ambas as interrupções (bordas de descida e subida)+
-   - [ ] Determinar como a disposição dos carácteres será feita
-   - [ ] Aprender como funciona a integração do MCU com o /display/ LCD Hitachi 44780
+   - [X] Determinar como a disposição dos caracteres será feita
+   - [X] Aprender como funciona a integração do MCU com o /display/ LCD Hitachi 44780
    - [X] Determinar como serão interpretados cliques de linhas em padrões diferentes
 
    

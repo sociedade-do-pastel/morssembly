@@ -30,9 +30,36 @@ PUSHLCD:
 	LCALL PEGAR_ENDR
 	LCALL OPERAR_LCD		
 	LCALL ZERAR
+	DJNZ 0X7D, CHECK_LCD
+	SJMP LIMPAR_LCD
+VOLTA_LCD:
 	RETI
 
-org 15h
+org 23h
+CHECK_LCD:
+	MOV A, 0X7D
+	CJNE A, #16, NOT_EQUAL
+	ACALL SEG_LINHA
+	NOP 
+NOT_EQUAL:
+	SJMP VOLTA_LCD
+LIMPAR_LCD:
+	SETB ENABLE
+	CLR RS
+	;; instrução para limpar o disp
+	MOV DADOS, #01H
+	CLR ENABLE
+	LCALL ESPERA
+	MOV 0X7D, #32
+	SJMP VOLTA_LCD
+SEG_LINHA:
+	SETB ENABLE
+	CLR RS
+	;; move para a posição 40 do disp
+	MOV DADOS, #0C0h 
+	CLR ENABLE
+	LCALL ESPERA
+	RET
 CONTINHAS:
 	;; gravar o tempo que ficou apertado
 	CLR C
@@ -60,6 +87,7 @@ MAIN_LOOP:
 	;; 16MS é 3e80 (16bits) 
 	MOV R2, #0X3E 
 	MOV R3, #0X80
+	MOV 0x7D, #32
 	SETB EA
 	SETB IT0
 	SETB EX0
@@ -129,12 +157,13 @@ FINAL:
 	MOV R0, A
 	ACALL ZERAR
 	SJMP CONTROLE
-
+;; subrotina para zerar temporizador
 ZERAR:
 	MOV TH0, #0
 	MOV TL0, #0
 	RET
-
+;; simplesmente copia o caractere atual
+;; para o display
 OPERAR_LCD:
 	SETB ENABLE
 	SETB RS
