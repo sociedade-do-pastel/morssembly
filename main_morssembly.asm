@@ -1,8 +1,8 @@
 BOTAO  EQU p2.7	
-ENABLE EQU p1.2
-;; vou mudar o RS do edsim
+;; vou mudar o RS e E do edsim
 ;; não precisamos trabalhar com 4 bit
-RS     EQU p1.3
+RS     EQU p0.0
+ENABLE EQU p0.1
 DB0    EQU p1.0
 DB1    EQU p1.1        
 DB2    EQU p1.2
@@ -23,24 +23,21 @@ org 0h
 INICIO:
 	LJMP MAIN_LOOP
 
-;; interrupção externa força reset
-;; e "empurra" caractere atual no lcd
-org 0Bh
-PUSHLCD:
-	;; PLACEHOLDER, A INDICARÁ QUAL
-	;; CARACTERE SERA MOSTRADO
-	;; MOV A, REGLCD
-	LCALL OPERAR_LCD		
-	ACALL ZERAR
-	RETI
-
-org 25h
+org 3h
 ZERAR:
 	MOV TH0, #0
 	MOV TL0, #0
 	RET
 
-org 30h
+;; interrupção externa força reset
+;; e "empurra" caractere atual no lcd
+org 0Bh
+PUSHLCD:
+	LCALL OPERAR_LCD		
+	ACALL ZERAR
+	RETI
+
+org 11h
 CONTINHAS:
 	;; gravar o tempo que ficou apertado
 	CLR C
@@ -53,24 +50,14 @@ CONTINHAS:
 	JC MENOR
 	MOV ENTR, #1 ;; 1 indica linha
 VOLTA:	
-	LJMP ATT_ENDR
+	ACALL ATT_ENDR
 
-org 65h
+org 21h
 MENOR:
 	MOV ENTR, #0 ;; 0 indica clique
-	LJMP VOLTA
-	
-org 50h
-TEMP: 
-	CPL TR0
-	RET
+	ACALL VOLTA
 
-org 6Bh
-OPERAR_LCD:
-	MOV B, R1
-	RET 
-
-org 80h
+org 25h
 MAIN_LOOP:
 	MOV TMOD, #00001001h 
 	;; interesse está no tempo apertado
@@ -90,9 +77,9 @@ MAIN_LOOP:
 	MOV R0, #32
 CONTROLE:
 	JB BOTAO, $
-	LCALL TEMP
+	ACALL TEMP
 	JNB BOTAO, $
-	LCALL TEMP
+	ACALL TEMP
 	LJMP CONTINHAS 
 ATT_ENDR:
 	CLR C ;; limpa carry
@@ -113,7 +100,7 @@ DIR_POS:
 	MOV A, ENDR
 	ADD A, R0
 	MOV ENDR, A
-	LJMP FINAL
+	AJMP FINAL
 NEG:
 	MOV A, ENTR
 	JNZ DIR_NEG
@@ -125,7 +112,7 @@ DIR_NEG:
 	MOV A, ENDR
 	SUBB A, R0
 	MOV ENDR, A
-	LJMP FINAL
+	AJMP FINAL
 PRIMEIRO:
 	MOV R4, #0 ;; R4 != 0 não é mais primeiro
 	MOV A, ENTR
@@ -135,7 +122,7 @@ PRI_ESQUERDA:
 	MOV A, ENDR
 	SUBB A, #31
 	MOV ENDR, A
-	LJMP FINAL
+	AJMP FINAL
 PRI_DIREITA:
 	MOV R1, #1 ;; R1 = 1 operações negativas
 	MOV A, ENDR
@@ -149,3 +136,10 @@ FINAL:
 	LCALL ZERAR
 	SJMP CONTROLE
 
+OPERAR_LCD:
+	MOV B, R1
+	RET 
+
+TEMP: 
+	CPL TR0
+	RET
