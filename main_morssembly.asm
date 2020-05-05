@@ -52,6 +52,7 @@ MENOR:
 	ACALL VOLTA
 
 MAIN_LOOP:
+	LCALL INIT_LCD
 	MOV TMOD, #00001001h 
 	;; interesse está no tempo apertado
 	MOV TH0, #0
@@ -129,17 +130,51 @@ FINAL:
 	ACALL ZERAR
 	SJMP CONTROLE
 
+ZERAR:
+	MOV TH0, #0
+	MOV TL0, #0
+	RET
+
 OPERAR_LCD:
-	MOV B, R1
+	SETB ENABLE
+	SETB RS
+	MOV DADOS, REGLCD
+	CLR ENABLE
+	ACALL ESPERA
 	RET 
 
 TEMP: 
 	CPL TR0
 	RET
 
-ZERAR:
-	MOV TH0, #0
-	MOV TL0, #0
+
+INIT_LCD:
+	;; forçar borda de descida
+	SETB ENABLE
+	CLR RS
+	;; iniciar como display de 2 linhas
+	;; e 8 bit
+	MOV DADOS, #38h
+	CLR ENABLE
+	ACALL ESPERA 
+	SETB ENABLE
+	CLR RS
+	MOV DADOS, #0Eh
+	CLR ENABLE
+	ACALL ESPERA
+	SETB ENABLE
+	CLR RS
+	MOV DADOS, #06h
+	CLR ENABLE
+	ACALL ESPERA
+	RET
+
+ESPERA:
+	;; valor aleatório da ram
+	;; delay alto? datasheet diz 40us
+	MOV 0X7F, #0x40
+	DJNZ 0X7F, $
+	MOV 0X7F, #0x40
 	RET
 
 org 10Fh
