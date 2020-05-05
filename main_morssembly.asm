@@ -1,8 +1,8 @@
 BOTAO  EQU p2.7	
-ENABLE EQU p1.2
-;; vou mudar o RS do edsim
+;; vou mudar o RS e E do edsim
 ;; não precisamos trabalhar com 4 bit
-RS     EQU p1.3
+RS     EQU p0.0
+ENABLE EQU p0.1
 DB0    EQU p1.0
 DB1    EQU p1.1        
 DB2    EQU p1.2
@@ -20,6 +20,11 @@ org 0h
 INICIO:
 	LJMP MAIN_LOOP
 
+org 03h
+MENOR:
+	CLR p1.1 ;; aqui um clique
+	LJMP VOLTA
+
 ;; interrupção externa força reset
 ;; e "empurra" caractere atual no lcd
 org 0Bh
@@ -31,13 +36,13 @@ PUSHLCD:
 	ACALL ZERAR
 	RETI
 
-org 25h
+org 11h
 ZERAR:
 	MOV TH0, #0
 	MOV TL0, #0
 	RET
 
-org 30h
+org 18h
 CONTINHAS:
 	;; gravar o tempo que ficou apertado
 	CLR C
@@ -51,24 +56,14 @@ CONTINHAS:
 	CLR P1.0 ;; teste aqui é uma linha
 VOLTA:	
 	NOP
-	LJMP FINAL
-
-org 65h
-MENOR:
-	CLR p1.1 ;; aqui um clique
-	LJMP VOLTA
+	AJMP FINAL
 	
-org 50h
+org 28h
 TEMP: 
 	CPL TR0
 	RET
 
-org 6Bh
-OPERAR_LCD:
-	MOV B, R1
-	RET 
-
-org 80h
+org 2Bh
 MAIN_LOOP:
 	MOV TMOD, #00001001h 
 	;; interesse está no tempo apertado
@@ -82,11 +77,16 @@ MAIN_LOOP:
 	SETB EX0
 CONTROLE:
 	JB BOTAO, $
-	LCALL TEMP
+	ACALL TEMP
 	JNB BOTAO, $
-	LCALL TEMP
-	LJMP CONTINHAS 
+	ACALL TEMP
+	AJMP CONTINHAS 
 FINAL:
-	LCALL ZERAR
+	ACALL ZERAR
 	SJMP CONTROLE
 
+
+org 4Eh
+OPERAR_LCD:
+	
+	RET 
