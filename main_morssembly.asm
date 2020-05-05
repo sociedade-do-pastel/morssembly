@@ -1,12 +1,42 @@
-BOTAO EQU p2.7	
+BOTAO  EQU p2.7	
+ENABLE EQU p1.2
+;; vou mudar o RS do edsim
+;; não precisamos trabalhar com 4 bit
+RS     EQU p1.3
+DB0    EQU p1.0
+DB1    EQU p1.1        
+DB2    EQU p1.2
+DB3    EQU p1.3
+DB4    EQU p1.4
+DB5    EQU p1.5
+DB6    EQU p1.6
+DB7    EQU p1.7
+DADOS  EQU p1
+;; REGISTRADOR PARA ENVIAR 
+;; DADOS AO LCD
+REGLCD EQU R7 
+
 org 0h
 INICIO:
 	LJMP MAIN_LOOP
+
+;; interrupção externa força reset
+;; e "empurra" caractere atual no lcd
+org 0Bh
+PUSHLCD:
+	;; PLACEHOLDER, A INDICARÁ QUAL
+	;; CARACTERE SERA MOSTRADO
+	;; MOV A, REGLCD
+	LCALL OPERAR_LCD		
+	ACALL ZERAR
+	RETI
+
 org 25h
 ZERAR:
 	MOV TH0, #0
 	MOV TL0, #0
 	RET
+
 org 30h
 CONTINHAS:
 	;; gravar o tempo que ficou apertado
@@ -33,6 +63,11 @@ TEMP:
 	CPL TR0
 	RET
 
+org 6Bh
+OPERAR_LCD:
+	MOV B, R1
+	RET 
+
 org 80h
 MAIN_LOOP:
 	MOV TMOD, #00001001h 
@@ -44,6 +79,7 @@ MAIN_LOOP:
 	MOV R3, #0X80
 	SETB EA
 	SETB IT0
+	SETB EX0
 CONTROLE:
 	JB BOTAO, $
 	LCALL TEMP
