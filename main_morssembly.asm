@@ -23,21 +23,16 @@ org 0h
 INICIO:
 	LJMP MAIN_LOOP
 
-org 3h
-ZERAR:
-	MOV TH0, #0
-	MOV TL0, #0
-	RET
-
 ;; interrupção externa força reset
 ;; e "empurra" caractere atual no lcd
 org 0Bh
 PUSHLCD:
+	LCALL PEGAR_ENDR
 	LCALL OPERAR_LCD		
-	ACALL ZERAR
+	LCALL ZERAR
 	RETI
 
-org 11h
+org 15h
 CONTINHAS:
 	;; gravar o tempo que ficou apertado
 	CLR C
@@ -52,12 +47,10 @@ CONTINHAS:
 VOLTA:	
 	ACALL ATT_ENDR
 
-org 21h
 MENOR:
 	MOV ENTR, #0 ;; 0 indica clique
 	ACALL VOLTA
 
-org 25h
 MAIN_LOOP:
 	MOV TMOD, #00001001h 
 	;; interesse está no tempo apertado
@@ -131,9 +124,9 @@ PRI_DIREITA:
 FINAL:
 	MOV A, R0
 	MOV B, #2
-	DIV AB
+	DIV AB 
 	MOV R0, A
-	LCALL ZERAR
+	ACALL ZERAR
 	SJMP CONTROLE
 
 OPERAR_LCD:
@@ -143,3 +136,18 @@ OPERAR_LCD:
 TEMP: 
 	CPL TR0
 	RET
+
+ZERAR:
+	MOV TH0, #0
+	MOV TL0, #0
+	RET
+
+org 10Fh
+PEGAR_ENDR:
+	MOV A, R5
+	MOV DPTR,#TABELA
+	MOVC A,@A+DPTR
+	MOV REGLCD,A
+	RET
+TABELA:
+	DB 45h, 49h, 53h, 48h, 35h, 34h, 56h, 20h, 33h, 55h, 46h, 20h, 20h, 20h, 20h, 32h, 41h, 52h, 4Ch, 20h, 20h, 20h, 2Bh, 20h, 57h, 50h, 20h, 20h, 4Ah, 20h, 31h, 20h, 30h, 39h, 20h, 20h, 38h, 20h, 4Fh, 20h, 20h, 51h, 20h, 37h, 5Ah, 47h, 4Dh, 20h, 20h, 59h, 20h, BCh, 43h, 4Bh, 20h, 2Fh, 58h, 3Dh, 36h, 42h, 44h, 4Eh, 54h
