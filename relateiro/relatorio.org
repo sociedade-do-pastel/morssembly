@@ -3,114 +3,69 @@
 #+TITLE: Interpretador de código morse para microcontroladores da família 8051
 #+AUTHOR: Guilherme Ormond Sampaio & Leon Ferreira Bellini
 
-* Introdução
+* Descrição do Projeto
   Projetado como codificação para o envio de mensagens por pulso a grandes 
 distâncias, o Código Morse mostrou-se de extrema importância exatamente por essa
-codificação, permitindo-o ser além de universal, facilmente compreendido. Dispositivos 
-para envio e interpretação de seus caracteres são facilmente produzidos. 
+encriptação, permitindo-o ser, além de universal, facilmente compreendido. Dispositivos 
+para envio e interpretação de seus caracteres são, então, facilmente produzidos. 
 
 #+CAPTION: Lista de caracteres do Código Morse (SNODGRASS & CAMP)
 #+NAME: fig:MORSE
 [[./img/codigo_morsa.png]]
-* Objetivos
+** Objetivos
   O objetivo geral do projeto é desenvolver um interpretador de código morse, ou
 seja, um "conversor" de morse para caracteres do alfabeto latino. O projeto será 
 exclusivo para microcontroladores da família 8051 e, por ter sua programação feita 
 totalmente em /assembly/ para tal família, a portabilidade do mesmo é mínima.
 
 Todas as simulações serão realizadas na IDE /edSim/, é recomendada a frequência
-de atualização de 10KHz por motivos os quais serão detalhados.
+de atualização de 1KHz por motivos os quais serão detalhados.
+
+Também é importante se notar que não são muitos os projetos que exploram tal tema,
+ao menos os presentes na plataforma para /host/ de repositórios /git/ e controle de 
+versionamento /GitHub/. No caso, apenas dois contendo as palavras-chave /morse/ e 
+*8051* foram achados, e um dos resultados é este próprio projeto. Deve-se exaltar 
+que ambos os códigos-fonte são totalmente diferentes e isso pode ser comprovado 
+ao realizar as devidas buscas e comparar as estruturas destes.
+
+#+CAPTION: Interpretadores de morse em /assembly/ com o microcontrolador 8051 no /GitHub/.
+#+NAME: fig:Interp
+[[./img/interp.png]]
 
 ** O interpretador 
-   Em primeira instância, o código para a distinção entre pontos e traços, os 
-quais são as principais características da codificação do sistema será baseado
-no quanto de tempo o usuário pressionou o botão ligado ao pino *P3.2* 
+   O código para a distinção entre pontos e traços, os 
+quais são as principais características da codificação do sistema é baseado
+no quanto de tempo o usuário pressionou o botão ligado ao pino *P2.7* 
 no teclado do simulador. O tempo em questão é de 16 milissegundos, tal métrica 
 fora obtida do tempo padrão para ativar-se um botão em um jogo que trabalhe com 
 60 /frames/ por segundo. Por se tratar de uma simulação, o tempo calculado para uma
 situação real apenas serve como uma forma de determinar o padrão, este sendo
-mais funcional quando o simulador está configurado para atualizar em 10MHz.
- O usuário *deve* apertar um outro botão para que o 
+mais funcional quando o simulador está configurado para atualizar em 1MHz.
+ O usuário *deve* apertar um outro botão (no caso o ligado ao P3.2) para que o 
 programa entenda que seu caractere já foi digitado, permitindo o microcontrolador 
 a interpretar a sequência recebida.
-
-#+CAPTION: Parte pronta do código a qual  determina se há uma linha ou clique
-#+NAME: fig:codigo_bot
-#+BEGIN_SRC asm
-  org 30h
-  CONTINHAS:
-	  ;; gravar o tempo que ficou apertado
-	  CLR C
-	  CLR OV	
-	  MOV A, TL0
-	  SUBB A, R3 ;; inutil talvez?
-	  ;; A - R3 ainda produziria carry
-	  MOV A, TH0
-	  SUBB A, R2 ;; se setar ACC, é menor?
-	  JC MENOR
-	  CLR P1.0 ;; teste aqui é uma linha
-  VOLTA:	
-	  NOP
-	  LJMP FINAL
-
-  org 65h
-  MENOR:
-	  CLR p1.1 ;; aqui um clique
-	  LJMP VOLTA
-	
-  org 50h
-  TEMP: 
-	  CPL TR0
-	  RET
-
-  org 80h
-  MAIN_LOOP:
-	  MOV TMOD, #00001001h 
-	  ;; interesse está no tempo apertado
-	  MOV TH0, #0
-	  MOV TL0, #0
-	  ;; 16MS é 3e80 (16bits) 
-	  MOV R2, #0X3E 
-	  MOV R3, #0X80
-	  SETB EA
-	  SETB IT0
-  CONTROLE:
-	  JB BOTAO, $
-	  LCALL TEMP
-	  JNB BOTAO, $
-	  LCALL TEMP
-	  LJMP CONTINHAS 
-  FINAL:
-	  LCALL ZERAR
-	  SJMP CONTROLE
-
-#+END_SRC
-
-No momento questões de otimização de ROM tomada e ciclos de processamento
-estão em segundo plano.
 
 ** O "banco de dados"
    Todos os caracteres podem ser dispostos num grafo do tipo árvore. Dependendo 
 da "pontuação" de cada caractere digitado, o ponteiro DPTR pode ser movimentado 
 de acordo por entre os endereços onde os códigos dos carácteres podem ser encontrados
-na memória. Estes códigos de início representarão letras e números compatíveis com 
-o /display/ LCD /Hitachi/ 44780.
+na memória. Estes códigos representam letras e números compatíveis com 
+o /display/ LCD /Hitachi/ 44780 em seu modo de duas linhas.
 
 #+CAPTION: Árvore de caracteres do código morse
 #+NAME: fig:MORSE_TREE
 [[./img/arvre.png]]
 
-   Os números grafados em vermelho representam a posição que ocuparão na memória, partindo 
+   Os números grafados em vermelho representam a posição que ocupam na memória, partindo 
 da posição 40 e seguinto até a posição 102. Caso seja necessária alguma alteração em 
 suas posições, basta alterar o endereço inicial pelo comando /org/.
 
 ** O /output/
-   Como dito anteriormente, inicialmente os carácteres serão dispostos no 
-/display/ 44780, o qual possuí módulo na IDE /edsim/, quaisquer carácteres inválidos
-serão substituídos por um /blankspace/ (ausência de caracter).
- Se o mesmo /display/ provar-se
-muito trabalhoso de se compreender, a transmissão via serial é uma alternativa, 
-uma vez que o tempo para entrega do projeto é curta.
+   Como dito anteriormente, inicialmente os caracteres serão dispostos no 
+/display/ 44780, o qual possuí módulo na IDE /edsim/, quaisquer caracteres inválidos
+serão substituídos por um /blankspace/ (ausência de caractere). Além disso, 
+quando o usuário aperta apenas o botão da interrupção, a operação é contada
+como invalida e um espaço é inserido, ou seja, funciona como uma barra de espaço.
 
 #+CAPTION: Módulo do edsim para LCD
 #+NAME: fig:LCD
@@ -185,3 +140,264 @@ uma vez que o tempo para entrega do projeto é curta.
 |      60 | D     | - . .         |             44 |
 |      61 | N     | - .           |             4E |
 |      62 | T     | -             |             54 |
+
+
+* Desenhos esquemáticos
+Foram utilizados apenas o /display/ LCD e os /switches/ 7 (p2.7) e 0 (p3.2), 
+servindo de botão para /input/ e interrupção respectivamente.
+#+CAPTION: Componentes simulados utilizados no projeto. (Autor.)
+#+NAME: fig:Componentes
+[[./img/screenshot.png]]
+* Fluxograma ou Diagrama
+* Código-fonte
+O código-fonte do projeto tem mais de 200 linhas e foi desenvolvido no curso de 
+uma semana. Nele são usadas /labels/ para cada pino relevante para o projeto. 
+Devido a dificuldades relacionadas ao fim do semestre letivo, não foi possível 
+promover a otimização do código. Foram-se utilizados, contanto, os 
+diferentes métodos de *CALL* e *JMP* para as apropriadas situações.
+
+#+BEGIN_SRC asm
+  BOTAO  EQU p2.7	
+  ;; vou mudar o RS e E do edsim
+  ;; não precisamos trabalhar com 4 bit
+  RS     EQU p0.0
+  ENABLE EQU p0.1
+  DB0    EQU p1.0
+  DB1    EQU p1.1        
+  DB2    EQU p1.2
+  DB3    EQU p1.3
+  DB4    EQU p1.4
+  DB5    EQU p1.5
+  DB6    EQU p1.6
+  DB7    EQU p1.7
+  DADOS  EQU p1
+  ;; REGISTRADOR PARA ENVIAR 
+  ;; DADOS AO LCD
+  REGLCD EQU R7 
+  ;; registradores para verificar a entrada
+  ENTR   EQU R6
+  ENDR   EQU R5
+
+  org 0h
+  INICIO:
+	  LJMP MAIN_LOOP
+
+  ;; interrupção externa força reset
+  ;; e "empurra" caractere atual no lcd
+  org 0Bh
+  PUSHLCD:
+	  LCALL PEGAR_ENDR
+	  LCALL OPERAR_LCD		
+	  LCALL ZERAR
+	  DJNZ 0X7D, CHECK_LCD
+	  SJMP LIMPAR_LCD
+  VOLTA_LCD:
+	  RETI
+
+  org 23h
+  CHECK_LCD:
+	  MOV A, 0X7D
+	  CJNE A, #16, NOT_EQUAL
+	  ACALL SEG_LINHA
+	  NOP 
+  NOT_EQUAL:
+	  SJMP VOLTA_LCD
+  LIMPAR_LCD:
+	  SETB ENABLE
+	  CLR RS
+	  ;; instrução para limpar o disp
+	  MOV DADOS, #01H
+	  CLR ENABLE
+	  LCALL ESPERA
+	  MOV 0X7D, #32
+	  SJMP VOLTA_LCD
+  SEG_LINHA:
+	  SETB ENABLE
+	  CLR RS
+	  ;; move para a posição 40 do disp
+	  MOV DADOS, #0C0h 
+	  CLR ENABLE
+	  LCALL ESPERA
+	  RET
+  CONTINHAS:
+	  ;; gravar o tempo que ficou apertado
+	  CLR C
+	  CLR OV	
+	  MOV A, TL0
+	  SUBB A, R3 ;; inutil talvez?
+	  ;; A - R3 ainda produziria carry
+	  MOV A, TH0
+	  SUBB A, R2 ;; se setar ACC, é menor?
+	  JC MENOR
+	  MOV ENTR, #1 ;; 1 indica linha
+  VOLTA:	
+	  LJMP ATT_ENDR
+
+  MENOR:
+	  MOV ENTR, #0 ;; 0 indica clique
+	  LJMP VOLTA
+
+  MAIN_LOOP:
+	  LCALL INIT_LCD
+	  MOV TMOD, #00001001h 
+	  ;; interesse está no tempo apertado
+	  MOV TH0, #0
+	  MOV TL0, #0
+	  ;; 16MS é 3e80 (16bits) 
+	  MOV R2, #0X3E 
+	  MOV R3, #0X80
+	  MOV 0x7D, #32
+	  SETB EA
+	  SETB IT0
+	  SETB EX0
+	  MOV ENDR, #31 ;; endereço inicial
+	  ;; R4 indica se o inserido é o
+	  ;; primeiro ou não
+	  MOV R4, #1 
+	  ;; R0 será usado em operações de endereço
+	  MOV R0, #32
+  CONTROLE:
+	  JB BOTAO, $
+	  ACALL TEMP
+	  JNB BOTAO, $
+	  ACALL TEMP
+	  LJMP CONTINHAS 
+  ATT_ENDR:
+	  CLR C ;; limpa carry
+	  ;; verifica se é o primeiro pelo R4
+	  MOV A, R4 
+	  JNZ PRIMEIRO 
+	  ;; verifica se deve ir pelo caminho
+	  ;; positivo ou negativo pelo R1
+	  MOV A, R1
+	  JNZ NEG
+  POS:
+	  MOV A, ENTR
+	  JNZ DIR_POS
+  ESQ_POS:
+	  INC ENDR
+	  LJMP FINAL
+  DIR_POS:
+	  MOV A, ENDR
+	  ADD A, R0
+	  MOV ENDR, A
+	  AJMP FINAL
+  NEG:
+	  MOV A, ENTR
+	  JNZ DIR_NEG
+  ESQ_NEG:
+	  DEC ENDR
+	  LJMP FINAL
+  DIR_NEG:
+	  CLR C
+	  MOV A, ENDR
+	  SUBB A, R0
+	  MOV ENDR, A
+	  AJMP FINAL
+  PRIMEIRO:
+	  MOV R4, #0 ;; R4 != 0 não é mais primeiro
+	  MOV A, ENTR
+	  JNZ PRI_DIREITA
+  PRI_ESQUERDA:
+	  MOV R1, #0 ;; R1 = 0 operações positivas
+	  MOV A, ENDR
+	  SUBB A, #31
+	  MOV ENDR, A
+	  AJMP FINAL
+  PRI_DIREITA:
+	  MOV R1, #1 ;; R1 = 1 operações negativas
+	  MOV A, ENDR
+	  ADD A, #31
+	  MOV ENDR, A
+  FINAL:
+	  MOV A, R0
+	  MOV B, #2
+	  DIV AB 
+	  MOV R0, A
+	  ACALL ZERAR
+	  SJMP CONTROLE
+  ;; subrotina para zerar temporizador
+  ZERAR:
+	  MOV TH0, #0
+	  MOV TL0, #0
+	  RET
+  ;; simplesmente copia o caractere atual
+  ;; para o display
+  OPERAR_LCD:
+	  SETB ENABLE
+	  SETB RS
+	  MOV DADOS, REGLCD
+	  CLR ENABLE
+	  ACALL ESPERA
+	  RET 
+
+  TEMP: 
+	  CPL TR0
+	  RET
+
+
+  INIT_LCD:
+	  ;; forçar borda de descida
+	  SETB ENABLE
+	  CLR RS
+	  ;; iniciar como display de 2 linhas
+	  ;; e 8 bit
+	  MOV DADOS, #38h
+	  CLR ENABLE
+	  ACALL ESPERA 
+	  SETB ENABLE
+	  CLR RS
+	  MOV DADOS, #0Eh
+	  CLR ENABLE
+	  ACALL ESPERA
+	  SETB ENABLE
+	  CLR RS
+	  MOV DADOS, #06h
+	  CLR ENABLE
+	  ACALL ESPERA
+	  RET
+
+  ESPERA:
+	  ;; valor aleatório da ram
+	  ;; delay alto? datasheet diz 40us
+	  MOV 0X7F, #0x40
+	  DJNZ 0X7F, $
+	  MOV 0X7F, #0x40
+	  RET
+
+  org 10Fh
+  PEGAR_ENDR:
+	  MOV A, R5
+	  MOV DPTR,#TABELA
+	  MOVC A,@A+DPTR
+	  MOV REGLCD,A
+  RESET_ENDR:
+	  MOV R4, #1
+	  MOV R0, #32
+	  MOV ENDR, #31
+	  RET
+  TABELA:
+	  DB 45h, 49h, 53h, 48h, 35h, 34h, 56h, 20h, 33h, 55h, 46h, 20h, 20h, 20h, 20h, 32h, 41h, 52h, 4Ch, 20h, 20h, 20h, 2Bh, 20h, 57h, 50h, 20h, 20h, 4Ah, 20h, 31h, 20h, 30h, 39h, 20h, 20h, 38h, 20h, 4Fh, 20h, 20h, 51h, 20h, 37h, 5Ah, 47h, 4Dh, 20h, 20h, 59h, 20h, BCh, 43h, 4Bh, 20h, 2Fh, 58h, 3Dh, 36h, 42h, 44h, 4Eh, 54h
+
+#+END_SRC
+* Imagens da simulação realizada na IDE
+** Digitando uma frase
+Aqui, o usuário insere a frase "/Praise the sun/", apertando os códigos 
+específicos de cada caractere e sinalizando o término da "digitação" 
+com o botão 0 (interrupção externa).
+
+#+CAPTION: Usuário inserindo a frase "/Praise the sun/" (Autor.)
+#+NAME: fig:Frase
+[[./img/praise_the_sun.png]]
+** Quando o limite de caracteres do /display/ é atingido
+Logo após o usuário inserir 31 caracteres. O /display/ LCD é limpado, 
+uma vez que a sub-rotina *LIMPA_LCD* é chamada. Também é realizada uma 
+checagem para forçar o cursor a funcionar na segunda linha.
+
+#+CAPTION: O display reseta quando os 31 caracteres são preenchidos. (Autor.)
+#+NAME: fig:TelaAntes
+[[./img/antes.png]]
+
+#+CAPTION: O reset em ação. (Autor.)
+#+NAME: fig:TelaDepois
+[[./img/depois.png]]
