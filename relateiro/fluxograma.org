@@ -1,0 +1,59 @@
+#+name:fluxograma-main
+#+BEGIN_SRC plantuml :file ./img/fluxograma-main.png
+  start
+  :Início;
+  :Botão Apertado
+  (BOTAO = 0);
+  :Inicia o contador;
+  :Botão solto
+  (BOTAO = 1);
+  if (Tempo apertado < 16ms) then (sim)
+       :ENTR = 0;
+  else (não)
+       :ENTR = 1;
+  endif
+  if (Primeiro caractere) then (sim)
+       :R4 = 0;
+  else (não)
+       :PARTE DO GUUG;
+  endif
+  end
+#+END_SRC
+
+#+RESULTS: fluxograma-main
+[[file:./img/fluxograma-main.png]]
+
+#+name:fluxograma-interrupcao
+#+BEGIN_SRC plantuml :file ./img/fluxograma-interrupcao.png
+  start
+  #Pink:Interrupção acionada
+  (botão no __p3.2__);
+
+  :Recupera o código
+  ,**ASCII** da tabela e
+  grava no registrador **REGLCD**;
+
+  :Copia o valor de
+  ,**REGLCD** e envia diretamente
+  aos pinos **P1**;
+
+  :Zera temporizador para
+  garantir que ele esteja
+  com valor 0 na próxima iteração;
+
+  :Checa o endereço 0x7D de RAM;
+
+  if (0x7D é zero) then (sim)
+     :Limpa o LCD;
+  else (não)
+     if (Terminou a primeira linha) then (sim)
+	 :Move o cursor para a segunda linha;
+      else (não)
+	   :Volta para o bloco da interrupção;
+	   endif
+  endif
+  end
+#+END_SRC
+
+#+RESULTS: fluxograma-interrupcao
+[[file:./img/fluxograma-interrupcao.png]]

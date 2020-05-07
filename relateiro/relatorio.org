@@ -23,7 +23,8 @@ de atualização de 1KHz por motivos os quais serão detalhados.
 
 Também é importante se notar que não são muitos os projetos que exploram tal tema,
 ao menos os presentes na plataforma para /host/ de repositórios /git/ e controle de 
-versionamento /GitHub/. No caso, apenas dois contendo as palavras-chave /morse/ e 
+versionamento /GitHub/. No caso, apenas dois contendo as palavras-chave /morse/,
+/assembly/ e  
 *8051* foram achados, e um dos resultados é este próprio projeto. Deve-se exaltar 
 que ambos os códigos-fonte são totalmente diferentes e isso pode ser comprovado 
 ao realizar as devidas buscas e comparar as estruturas destes.
@@ -141,7 +142,6 @@ como invalida e um espaço é inserido, ou seja, funciona como uma barra de espa
 |      61 | N     | - .           |             4E |
 |      62 | T     | -             |             54 |
 
-
 * Desenhos esquemáticos
 Foram utilizados apenas o /display/ LCD e os /switches/ 7 (p2.7) e 0 (p3.2), 
 servindo de botão para /input/ e interrupção respectivamente.
@@ -149,6 +149,19 @@ servindo de botão para /input/ e interrupção respectivamente.
 #+NAME: fig:Componentes
 [[./img/screenshot.png]]
 * Fluxograma ou Diagrama
+Por "ignorar" o curso de qualquer operação do programa,
+um fluxograma para a interrupção externa foi definido separadamente.
+
+** Programa principal
+#+CAPTION: Funcionamento do programa principal (Autor.)
+#+NAME: fig:flux-main
+[[./img/fluxograma-main.png]]
+
+** Interrupção externa
+#+CAPTION: Funcionamento da interrupção externa (Autor.)
+#+NAME: fig:flux-ext
+[[./img/fluxograma-interrupcao.png]]
+
 * Código-fonte
 O código-fonte do projeto tem mais de 200 linhas e foi desenvolvido no curso de 
 uma semana. Nele são usadas /labels/ para cada pino relevante para o projeto. 
