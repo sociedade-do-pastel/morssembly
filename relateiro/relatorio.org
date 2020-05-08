@@ -1,3 +1,7 @@
+#+LATEX_HEADER: \usepackage[margin=2cm]{geometry}
+#+LATEX_HEADER: \usepackage[scaled]{helvet}
+#+LATEX_HEADER: \renewcommand\familydefault{\sfdefault} 
+#+LATEX_HEADER: \usepackage[T1]{fontenc}
 #+BIND: org-export-publishing-directory "output"
 #+OPTIONS: toc:nil
 #+TITLE: Interpretador de código morse para microcontroladores da família 8051
@@ -26,6 +30,7 @@ distâncias, o Código Morse mostrou-se de extrema importância exatamente por e
 encriptação, permitindo-o ser, além de universal, facilmente compreendido. Dispositivos 
 para envio e interpretação de seus caracteres são, então, facilmente produzidos. 
 
+#+ATTR_LATEX: :width 0.8\textwidth :placement [hp]
 #+CAPTION: Lista de caracteres do Código Morse (SNODGRASS & CAMP)
 #+NAME: fig:MORSE
 [[./img/codigo_morsa.png]]
@@ -46,6 +51,7 @@ versionamento /GitHub/. No caso, apenas dois contendo as palavras-chave /morse/,
 que ambos os códigos-fonte são totalmente diferentes e isso pode ser comprovado 
 ao realizar as devidas buscas e comparar as estruturas destes.
 
+#+ATTR_LATEX: :placement [!h]
 #+CAPTION: Interpretadores de morse em /assembly/ com o microcontrolador 8051 no /GitHub/.
 #+NAME: fig:Interp
 [[./img/interp.png]]
@@ -63,13 +69,15 @@ mais funcional quando o simulador está configurado para atualizar em 1MHz.
 programa entenda que seu caractere já foi digitado, permitindo o microcontrolador 
 a interpretar a sequência recebida.
 
+#+LATEX: \clearpage
 ** O "banco de dados"
    Todos os caracteres podem ser dispostos num grafo do tipo árvore. Dependendo 
 da "pontuação" de cada caractere digitado, o ponteiro DPTR pode ser movimentado 
-de acordo por entre os endereços onde os códigos dos carácteres podem ser encontrados
+de acordo por entre os endereços onde os códigos dos caracteres podem ser encontrados
 na memória. Estes códigos representam letras e números compatíveis com 
 o /display/ LCD /Hitachi/ 44780 em seu modo de duas linhas.
 
+#+ATTR_LATEX: :width 0.9\textwidth :placement [!h]
 #+CAPTION: Árvore de caracteres do código morse
 #+NAME: fig:MORSE_TREE
 [[./img/arvre.png]]
@@ -78,6 +86,7 @@ o /display/ LCD /Hitachi/ 44780 em seu modo de duas linhas.
 da posição 40 e seguinto até a posição 102. Caso seja necessária alguma alteração em 
 suas posições, basta alterar o endereço inicial pelo comando /org/.
 
+
 ** O /output/
    Como dito anteriormente, inicialmente os caracteres serão dispostos no 
 /display/ 44780, o qual possuí módulo na IDE /edsim/, quaisquer caracteres inválidos
@@ -85,10 +94,13 @@ serão substituídos por um /blankspace/ (ausência de caractere). Além disso,
 quando o usuário aperta apenas o botão da interrupção, a operação é contada
 como invalida e um espaço é inserido, ou seja, funciona como uma barra de espaço.
 
+#+ATTR_LATEX: :width 0.5\textwidth :placement [!h]
 #+CAPTION: Módulo do edsim para LCD
 #+NAME: fig:LCD
 [[./img/lcd.png]]
 
+
+#+ATTR_LATEX: :placement [!h]
 #+CAPTION: Tabela de posições, caracteres e representação dos caracteres no LCD.
 | memória | letra | representação | conteúdo (hex) |
 |---------+-------+---------------+----------------|
@@ -128,7 +140,7 @@ como invalida e um espaço é inserido, ou seja, funciona como uma barra de espa
 |      33 | 9     | - - - - .     |             39 |
 |      34 |       | - - - -       |             20 |
 |      35 |       | - - - . -     |             20 |
-
+#+LATEX: \clearpage
 | memória | letra | representação | conteúdo (hex) |
 |---------+-------+---------------+----------------|
 |      36 | 8     | - - - . .     |             38 |
@@ -159,26 +171,42 @@ como invalida e um espaço é inserido, ou seja, funciona como uma barra de espa
 |      61 | N     | - .           |             4E |
 |      62 | T     | -             |             54 |
 
+#+LATEX: \clearpage
 * Desenhos esquemáticos
 Foram utilizados apenas o /display/ LCD e os /switches/ 7 (p2.7) e 0 (p3.2), 
 servindo de botão para /input/ e interrupção respectivamente.
+
+#+ATTR_LATEX: :width 0.9\textwidth :placement [!h]
 #+CAPTION: Componentes simulados utilizados no projeto. (Autor.)
 #+NAME: fig:Componentes
 [[./img/screenshot.png]]
+
+
+
+
+
+#+LATEX: \clearpage
 * Fluxograma ou Diagrama
 Por "ignorar" o curso de qualquer operação do programa,
 um fluxograma para a interrupção externa foi definido separadamente.
 
 ** Programa principal
+#+ATTR_LATEX: :width 0.91\textwidth :placement [!h]
 #+CAPTION: Funcionamento do programa principal (Autor.)
 #+NAME: fig:flux-main
 [[./img/fluxograma-main.png]]
 
+
+#+LATEX: \newpage
 ** Interrupção externa
+#+ATTR_LATEX: :placement [!h]
 #+CAPTION: Funcionamento da interrupção externa (Autor.)
 #+NAME: fig:flux-ext
 [[./img/fluxograma-interrupcao.png]]
 
+
+#+LATEX: \newpage 
+#+LATEX: \clearpage
 * Código-fonte
 O código-fonte do projeto tem mais de 200 linhas e foi desenvolvido no curso de 
 uma semana. Nele são usadas /labels/ para cada pino relevante para o projeto. 
@@ -186,6 +214,8 @@ Devido a dificuldades relacionadas ao fim do semestre letivo, não foi possível
 promover a otimização do código. Foram-se utilizados, contanto, os 
 diferentes métodos de *CALL* e *JMP* para as apropriadas situações.
 
+
+#+ATTR_LATEX: :small 
 #+BEGIN_SRC asm
   BOTAO  EQU p2.7	
   ;; vou mudar o RS e E do edsim
@@ -407,30 +437,43 @@ diferentes métodos de *CALL* e *JMP* para as apropriadas situações.
 	  MOV ENDR, #31
 	  RET
   TABELA:
-	  DB 45h, 49h, 53h, 48h, 35h, 34h, 56h, 20h, 33h, 55h, 46h, 20h, 20h, 20h, 20h, 32h, 41h, 52h, 4Ch, 20h, 20h, 20h, 2Bh, 20h, 57h, 50h, 20h, 20h, 4Ah, 20h, 31h, 20h, 30h, 39h, 20h, 20h, 38h, 20h, 4Fh, 20h, 20h, 51h, 20h, 37h, 5Ah, 47h, 4Dh, 20h, 20h, 59h, 20h, BCh, 43h, 4Bh, 20h, 2Fh, 58h, 3Dh, 36h, 42h, 44h, 4Eh, 54h
+	  DB 45h, 49h, 53h, 48h, 35h, 34h, 56h, 20h, 33h, 55h, 46h, 20h, 
+	  20h, 20h, 20h, 32h, 41h, 52h, 4Ch, 20h, 20h, 20h, 2Bh, 20h, 57h, 
+	  50h, 20h, 20h, 4Ah, 20h, 31h, 20h, 30h, 39h, 20h, 20h, 38h, 20h, 4Fh, 
+	  20h, 20h, 51h, 20h, 37h, 5Ah, 47h, 4Dh, 20h, 20h, 59h, 20h, BCh, 43h, 
+	  4Bh, 20h, 2Fh, 58h, 3Dh, 36h, 42h, 44h, 4Eh, 54h
 
 #+END_SRC
+
+#+LATEX: \clearpage
 * Imagens da simulação realizada na IDE
 ** Digitando uma frase
 Aqui, o usuário insere a frase "/Praise the sun/", apertando os códigos 
 específicos de cada caractere e sinalizando o término da "digitação" 
 com o botão 0 (interrupção externa).
 
+
+#+ATTR_LATEX: :width 0.9\textwidth :placement [!h]
 #+CAPTION: Usuário inserindo a frase "/Praise the sun/" (Autor.)
 #+NAME: fig:Frase
 [[./img/praise_the_sun.png]]
+#+LATEX: \clearpage
 ** Quando o limite de caracteres do /display/ é atingido
 Logo após o usuário inserir 31 caracteres. O /display/ LCD é limpado, 
 uma vez que a sub-rotina *LIMPA_LCD* é chamada. Também é realizada uma 
 checagem para forçar o cursor a funcionar na segunda linha.
 
+#+ATTR_LATEX: :width 0.9\textwidth :placement [!h]
 #+CAPTION: O display reseta quando os 31 caracteres são preenchidos. (Autor.)
 #+NAME: fig:TelaAntes
 [[./img/antes.png]]
 
+#+ATTR_LATEX: :width 0.9\textwidth
 #+CAPTION: O reset em ação. (Autor.)
 #+NAME: fig:TelaDepois
 [[./img/depois.png]]
+
+#+LATEX: \clearpage
 * Bibliografia
  -  8051PROJECTS. *LCD Interfacing*. Disponível em: https://www.8051projects.info/lcd.php. Acesso em: 7 maio 2020.
  -  RAVI. *8051 Microcontroller Assembly Language Programming*. Disponível em: https://www.electronicshub.org/8051-microcontroller-assembly -language-programming/. Acesso em: 7 maio 2020.
