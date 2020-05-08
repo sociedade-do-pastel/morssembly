@@ -3,6 +3,23 @@
 #+TITLE: Interpretador de código morse para microcontroladores da família 8051
 #+AUTHOR: Guilherme Ormond Sampaio & Leon Ferreira Bellini
 
+* Integrantes
+
+| Nome                     |           RA |
+|--------------------------+--------------|
+| Guilherme Ormond Sampaio | 22.218.007-7 |
+| Leon Ferreira Bellini    | 22.218.002-8 |
+* Links
+** Video
+  Segue o link com a demonstração do funcionamento do projeto e explicação das subrotinas.
+
+ - https://youtu.be/WXWiU6Fg1qQ
+ 
+** GitHub
+  Segue o link do projeto no GitHub, contendo todas as informações e commits do código.
+
+ - https://github.com/sociedade-do-pastel/morssembly
+
 * Descrição do Projeto
   Projetado como codificação para o envio de mensagens por pulso a grandes 
 distâncias, o Código Morse mostrou-se de extrema importância exatamente por essa
@@ -414,3 +431,6 @@ checagem para forçar o cursor a funcionar na segunda linha.
 #+CAPTION: O reset em ação. (Autor.)
 #+NAME: fig:TelaDepois
 [[./img/depois.png]]
+* Bibliografia
+ -  8051PROJECTS. *LCD Interfacing*. Disponível em: https://www.8051projects.info/lcd.php. Acesso em: 7 maio 2020.
+ -  RAVI. *8051 Microcontroller Assembly Language Programming*. Disponível em: https://www.electronicshub.org/8051-microcontroller-assembly -language-programming/. Acesso em: 7 maio 2020.

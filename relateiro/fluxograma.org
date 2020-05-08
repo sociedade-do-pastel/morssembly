@@ -1,22 +1,45 @@
 #+name:fluxograma-main
 #+BEGIN_SRC plantuml :file ./img/fluxograma-main.png
   start
+  repeat
   :Início;
   :Botão Apertado
   (BOTAO = 0);
   :Inicia o contador;
   :Botão solto
   (BOTAO = 1);
+  :Para o contador;
   if (Tempo apertado < 16ms) then (sim)
        :ENTR = 0;
   else (não)
        :ENTR = 1;
   endif
-  if (Primeiro caractere) then (sim)
+  if (Primeiro caractere 
+  (R4 = 1)) then (sim)
        :R4 = 0;
+       if (Verifica inserção) then (ponto)
+            :ENDR = ENDR-31;
+            :R1 = 0;
+       else (traço)
+            :ENDR = ENDR+31;
+            :R1 = 1;
+       endif
   else (não)
-       :PARTE DO GUUG;
+       if (R1 = 0) then (sim)
+            if (Verifica inserção) then (ponto)
+                 :ENDR = ENDR+1;
+            else (traço)
+                 :ENDR = ENDR+2^altura;
+            endif
+       else (não)
+            if (Verifica inserção) then (ponto)
+                 :ENDR = ENDR-1;
+            else (traço)
+                 :ENDR = ENDR-2^altura;
+            endif
+       endif
   endif
+  repeat while
   end
 #+END_SRC
 
